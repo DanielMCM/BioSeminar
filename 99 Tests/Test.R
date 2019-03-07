@@ -24,6 +24,7 @@ detectionInformation = "false"
 includeCode = "false"
 
 # Query 4,10
+diseaseName = "Cancer"
 
 # Querys 4,6-9
 excludeSemanticTypes = "" #dsyn, sosy
