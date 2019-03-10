@@ -10,10 +10,6 @@ source("01 Graph/module.R")
 header <- function(id) {
     ns <- NS(id)
     dashboardHeader(title = "DISNET Graph")
-    #dropdownMenu(type = "notifications", icon = icon("warning"), badgeStatus = "warning",
-                                 #notificationItem("Some tabs take a while to load")),
-    # )
-    #)
 }
 
 # Menu
@@ -22,7 +18,7 @@ sidebar <- function(id) {
     ns <- NS(id)
     sidebarMenu(
         Wel_menuItem("Welc"),
-        Gra_menuItem("Grap")
+        Gra_menuItem("Graph")
     )
 }
 
@@ -30,5 +26,5 @@ sidebar <- function(id) {
 
 content <- function(id) {
     ns <- NS(id)
-    do.call(tabItems, c(Wel_ui("Welc"), Gra_ui("Grap")))
+    do.call(tabItems, c(Wel_ui("Welc"), Gra_ui("Graph")))
 }

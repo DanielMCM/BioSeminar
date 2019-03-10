@@ -1,0 +1,46 @@
+DISNET API
+
+Url: http://disnet.ctb.upm.es/
+
+TODO:
+[X] Retrieve data from API
+[X] Simple pre-processing
+[X] Integrate basic graph with retrieved data
+[_] Query options (interaction)
+[_]	...
+
+
+Disease list : [] (Response)
+- diseaseId
+- name
+- url
+- codesCount
+- codes:
+     - code
+     - typeCode
+- disnetConceptsCount
+
+DiseaseConcept list: [] (Response)
+- diseaseId
+- name
+- url
+- disnetConceptCount
+- disnetConceptList:
+      - cui
+      - name
+      - semanticTypes: []
+
+Most common / less common: DiseaseConcepts: [] (Response)
+- cui
+- name
+- common
+- semanticTypes: []
+
+Search by disease name: [] (Response)
+- diseaseId
+- name
+- urlsCount
+- urls: []
+- codesCount
+- disnetConceptsCount
+- code: []

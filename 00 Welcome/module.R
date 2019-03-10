@@ -4,7 +4,7 @@
 
 Wel_menuItem <- function(id) {
     ns <- NS(id)
-    menuItem("Welc", tabName = str_c(id, "Wel1"), icon = icon("thumbs-up"))
+    menuItem("Welcome", tabName = str_c(id, "Wel1"), icon = icon("thumbs-up"))
 }
 
 # UI (tabs)

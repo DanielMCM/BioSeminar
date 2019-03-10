@@ -7,6 +7,7 @@ library(shinydashboard)
 library(ggplot2)
 library(visNetwork)
 library(stringr)
+library(jsonlite)
 
 ###################################################
 ##########           Sources       ################
@@ -41,8 +42,8 @@ ui <- dashboardPage(
 ###################################################
 
 server <- function(input, output, session) {
-    callModule(Wel_server, "Welc")
-    callModule(Gra_server, "Grap")
+    callModule(Wel_server, "Welcome")
+    callModule(Gra_server, "Graph")
 }
 
 shinyApp(ui, server)

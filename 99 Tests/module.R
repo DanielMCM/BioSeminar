@@ -38,7 +38,9 @@ Graph_ui <- function(id) {
 # Server
 
 Graph_server <- function(input, output, session) {
+
     updateSelectizeInput(session, "select", choices = isolate(values$node)[, 4], server = TRUE)
+
     mark <- reactiveValues(counter = -1,
                            node_5 = data.frame(id = character(),
                                                label = character(),
@@ -48,7 +50,7 @@ Graph_server <- function(input, output, session) {
         print(mark$counter)
         calculate_nodes(input$select)
     })
-    
+
     observeEvent(input$do, {
         mark$counter <- mark$counter + 1
     })
@@ -70,10 +72,8 @@ Graph_server <- function(input, output, session) {
 
     output$network <- renderVisNetwork({
         ledges <- data.frame(color = c("#339933",
-                                rgb(252, 0, 0, max = 255), "lightblue"),
-                                label = c("European Contribution under 993K",
-                                          "European Contribution above 993K",
-                                          "Researcher"))
+                             rgb(252, 0, 0, max = 255), "lightblue"),
+                             label = c("European Contribution under 993K", "European Contribution above 993K", "Researcher"))
         # minimal example
         visNetwork(node_4(),
                values$edge[(values$edge[, "from"] %in% node_4()[, c("id")]) & (values$edge[, "to"] %in% node_4()[, c("id")]),],
@@ -109,6 +109,6 @@ Graph_server <- function(input, output, session) {
         visLegend(addEdges = ledges, useGroups = TRUE) %>%
         visInteraction(hideEdgesOnDrag = TRUE) %>%
         visEdges(smooth = FALSE)
-        })
+    })
 
 }
