@@ -8,13 +8,16 @@ library(ggplot2)
 library(visNetwork)
 library(stringr)
 library(jsonlite)
+library(plotrix)
+library(randomcoloR)
+library(tidyverse)
 
 ###################################################
 ##########           Sources       ################
 ###################################################
 
-source("Layout.R")
 source("Global.R")
+source("Layout.R")
 source("Helpers.R")
 
 ###################################################

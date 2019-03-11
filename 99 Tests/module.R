@@ -39,7 +39,7 @@ Graph_ui <- function(id) {
 
 Graph_server <- function(input, output, session) {
 
-    updateSelectizeInput(session, "select", choices = isolate(values$node)[, 4], server = TRUE)
+    updateSelectizeInput(session, "select", choices = isolate(values$node)[, 2], server = TRUE)
 
     mark <- reactiveValues(counter = -1,
                            node_5 = data.frame(id = character(),
