@@ -34,8 +34,9 @@ diseases_master <- merge(diseases_master,
                     by = "typeCode")
 
 #diseases_master$color <- "green"
+diseases_master$ID <- seq.int(nrow(diseases_master))
 
-temp <- unique(diseases_master[, c("code", "code", "typeCode", "color")])
+temp <- unique(diseases_master[, c("ID", "code", "typeCode", "color")])
 colnames(temp) <- c("id", "label", "title", "color")
 
 nodes <- rbind(nodes, temp[,c("id","label", "title","color")])
@@ -43,5 +44,3 @@ nodes <- rbind(nodes, temp[,c("id","label", "title","color")])
 values$nodes <- nodes
 values$edges <- edges
 
-
-diseases_with_concepts <- values$diseases_with_disnetconcepts_by_diseasename()$diseaseList
