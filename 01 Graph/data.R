@@ -1,5 +1,9 @@
 # Preprocessing
 
+###
+# EXTRACT INFO FROM API (QUERY3)
+###
+
 diseases_with_codes <- isolate(values$diseases_with_codes()$diseaseList)
 #diseases_with_concepts <- values$diseases_with_disnetconcepts_by_diseasename()$diseaseList
 
@@ -9,38 +13,65 @@ diseases_with_codes <- isolate(values$diseases_with_codes()$diseaseList)
 
 # Disease with codes processing
 
+###
+# EXTRACT REFERENCES FROM DIFFERENT SOURCES
+###
+
 diseases_master <- unnest(diseases_with_codes)
 
-edges <- diseases_master[, c("diseaseId", "code")]
-colnames(edges) <- c("from", "to")
 
 #diseases_master$name2 <- paste(diseases_master$name, " - ", diseases_master$url)
 
+###
+# GENERATE NODES
+###
 
-nodes <- unique(diseases_master[, c("diseaseId", "name")])
+nodes <- as.data.frame(unique(paste(diseases_master[, "diseaseId"], " - ", diseases_master[, "name"])))
 nodes$title <- "DISNET"
-colnames(nodes) <- c("id", "label","title")
+colnames(nodes) <- c("label", "title")
 
-uniq <- as.data.frame(unique(diseases_master$typeCode))
-colors <- distinctColorPalette(nrow(uniq)+1)
-nodes$color <- colors[1]
-uniq$colors <- colors[2:length(colors)]
-uniq$color2 <- sapply(uniq[, 2], color.id)
+uniq <- as.data.frame(unique(diseases_master[,c("code", "typeCode")]))
+colnames(uniq) <- c("label", "title")
+nodes <- rbind(nodes, uniq)
+nodes$id <- seq.int(nrow(nodes))
+colnames(nodes) <- c("label", "title", "id")
 
-colnames(uniq) <- c("typeCode", "color", "color1")
+nodes <- nodes[,c(3,1,2)]
 
-diseases_master <- merge(diseases_master,
+###
+# LINK NODE ID TO MASTER
+###
+
+diseases_master$label1 <- paste(diseases_master[, "diseaseId"], " - ", diseases_master[, "name"])
+
+diseases_master <- merge(diseases_master,nodes[,c("label", "id")], by.x="label1", by.y = "label")
+
+diseases_master <- merge(diseases_master, nodes[, c("label", "title", "id")], by.x = c("code","typeCode"), by.y = c("label", "title"))
+
+### 
+# CREATE EDGES
+###
+edges <- diseases_master[, c("id.x", "id.y")]
+colnames(edges) <- c("from", "to")
+
+###
+# ASSIGN COLORS TO NODES
+###
+
+uniq <- as.data.frame(unique(nodes[,"title"]))
+uniq$colors <- distinctColorPalette(nrow(uniq))
+
+
+colnames(uniq) <- c("title", "color")
+
+nodes <- merge(nodes,
                     uniq,
-                    by = "typeCode")
+                    by = "title")
 
 #diseases_master$color <- "green"
-diseases_master$ID <- seq.int(nrow(diseases_master))
-
-temp <- unique(diseases_master[, c("ID", "code", "typeCode", "color")])
-colnames(temp) <- c("id", "label", "title", "color")
-
-nodes <- rbind(nodes, temp[,c("id","label", "title","color")])
-
+###
+# ASSIGN TO VALUES
+###
 values$nodes <- nodes
 values$edges <- edges
 

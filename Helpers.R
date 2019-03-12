@@ -33,3 +33,13 @@ calculate_nodes <- function(selection) {
     node_3a <- unique(rbind(node_1, node_2))
     return(node_3a)
 }
+
+lookfor_links <- function() {
+    ## Buscar por id y source de la seleccion
+    ## Mirar si estan ya buscados
+
+    ## Llamar a los que no
+
+    ## Guardar en nodes y edges
+
+}

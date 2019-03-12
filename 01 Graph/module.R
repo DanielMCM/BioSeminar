@@ -18,7 +18,8 @@ Gra_ui <- function(id) {
         box(width = 3,
             h3("Query options"),
             selectizeInput(ns("select"), "Select any node", choices = NULL, options = NULL, multiple = TRUE),
-            actionButton(ns("do"), "Generate 1 level conexions"),
+            actionButton(ns("do_link"), "Call for symptoms"),
+            actionButton(ns("do"), "Generate 1 level conections"),
             actionButton(ns("reset"), "Reset graph")),
         box(width = 9, align = "Center",
             h2("Diseases graph"), p(verbatimTextOutput(ns("message"))),
@@ -28,7 +29,7 @@ Gra_ui <- function(id) {
 # Server
 
 Gra_server <- function(input, output, session) {
-    updateSelectizeInput(session, "select", choices = isolate(values$nodes)[, 2], server = TRUE)
+    updateSelectizeInput(session, "select", choices = isolate(values$nodes)[, "label"], server = TRUE)
 
     mark <- reactiveValues(counter = -1,
                             node_5 = data.frame(id = character(),
@@ -45,6 +46,13 @@ Gra_server <- function(input, output, session) {
     observeEvent(input$reset, {
         mark$counter <- -1
     })
+
+    observeEvent(input$do_link, {
+        lookfor_links()
+    })
+
+    # Duplicar el concepto del boton para extraer sintomas
+
 
     node_4 <- eventReactive(input$do, {
         if (mark$counter == 0) {
