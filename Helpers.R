@@ -34,8 +34,61 @@ calculate_nodes <- function(selection) {
     return(node_3a)
 }
 
-lookfor_links <- function() {
-    ## Buscar por id y source de la seleccion
+lookfor_links <- function(select) {
+    ## Input are the nodes currently displayed
+
+    ## We pick those nodes that are not from DISNET (
+    look_0 <- select[(select[, "title"] != "DISNET") &
+                    (select[, "title"] != "Wheeless Online") &
+                    (select[, "title"] != "Patient UK") &
+                    #(select[, "title"] != "eMedicine") &
+                    (select[, "title"] != "OMIM") &
+                    (select[, "title"] != "ICD-O"),]
+    print(look_0)
+    look_0$withsymp <- paste(look_0$label, " - ", look_0$title)
+
+    ## We check if we already extracted them
+    look <- subset(look_0, !(look_0$withsymp %in% values$withsymp$label_title))
+
+    ## For those that not, we extract them and add them to the list
+    for (i in 1:nrow(look)) {
+        if (i == 1) {
+            values$diseaseCode <- look[i, "label"]
+            values$typeCode <- look[i, "title"]
+            cuis <- isolate(unnest(values$diseases_with_disnetconcepts_by_code_and_type()$diseaseList))
+            cuis$to <- look_0[i, "id"]
+            values$withsymp <- rbind(isolate(values$withsymp), look_0[i, "withsymp"])
+        }
+        else {
+            values$diseaseCode <- look[i, "label"]
+            values$typeCode <- look[i, "title"]
+            precuis <- isolate(unnest(values$diseases_with_disnetconcepts_by_code_and_type()$diseaseList))
+            precuis$to <- look_0[i, "id"]
+            cuis <- rbind(cuis, precuis)
+            values$withsymp <- rbind(isolate(values$withsymp), look_0[i, "withsymp"])
+        }
+    }
+    ## We select the the edges to add
+    pre_edge <- cuis[, c("cui", "to")]
+    colnames(pre_edge) <- c("from", "to")
+
+    ## We select the ndoes to add
+    pre_node <- unique(cuis[, c("cui", "name1")])
+    colnames(pre_node) <- c("id", "label")
+    pre_node$title <- "Symptom"
+    pre_node$color <- "black"
+    pre_node <- pre_node[, c("title", "id", "label", "color")]
+
+    ## We add them to the global
+    values$nodes <- rbind(isolate(values$nodes), pre_node)
+    values$edges <- rbind(isolate(values$edges), pre_edge)
+
+    ## We add them to the current selection
+
+    select1 <- rbind(select, pre_node)
+
+    return(select1)
+
     ## Mirar si estan ya buscados
 
     ## Llamar a los que no

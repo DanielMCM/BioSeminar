@@ -67,16 +67,6 @@ query4_1 <- paste0("/query/disnetConceptList?source=", source,
                  "&includeCode=", includeCode,
                  "&token=", token)
 
-query4_2 <- paste0("/query/disnetConceptList?source=", source,
-                 "&version=", version,
-                 "&diseaseCode=", diseaseCode,
-                 "&typeCode=", typeCode,
-                 "&excludeSemanticTypes=", excludeSemanticTypes,
-                 "&forceSemanticTypes=", forceSemanticTypes,
-                 "&matchExactName=", matchExactName,
-                 "&detectionInformation=", detectionInformation,
-                 "&includeCode=", includeCode,
-                 "&token=", token)
 
 query5 <- paste0("/query/diseaseCount?source=", source,
                  "&version=", version,

@@ -5,7 +5,9 @@
 values <- reactiveValues()
 
 values$message <- NULL
-
+values$withsymp <- data.frame(label_title = character())
+values$diseaseCode = "117.7"
+values$typeCode = "ICD-9-CM"
 # Calls
 
 values$diseases_with_codes <- function() {
@@ -21,6 +23,19 @@ values$diseases_with_disnetconcepts_by_diseasename <- function() {
 
 values$diseases_with_disnetconcepts_by_code_and_type <- function() {
     values$message <- "Retrieving diseases with disnet concepts..."
+    print(values$diseaseCode)
+    print(values$typeCode)
+    query4_2 <- paste0("/query/disnetConceptList?source=", source,
+                 "&version=", version,
+                 "&diseaseCode=", values$diseaseCode,
+                 "&typeCode=", values$typeCode,
+                 "&excludeSemanticTypes=", excludeSemanticTypes,
+                 "&forceSemanticTypes=", forceSemanticTypes,
+                 "&matchExactName=", matchExactName,
+                 "&detectionInformation=", detectionInformation,
+                 "&includeCode=", includeCode,
+                 "&token=", token)
+
     get_data(urls.disnet, query4_2)
 }
 
