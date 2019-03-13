@@ -3,6 +3,7 @@
 ###################################################
 
 library(shiny)
+library(shinyjs)
 library(shinydashboard)
 library(ggplot2)
 library(visNetwork)
@@ -33,9 +34,23 @@ ui <- dashboardPage(
     #shinyDashboardThemes(
       #theme = "blue gradient"
     #),
+    #tags$head(
+      #tags$link(rel = "stylesheet", type = "text/css", href = "bootstrap.css")
+    #),
+    shinyjs::useShinyjs(debug = TRUE),
     tags$head(
-      tags$link(rel = "stylesheet", type = "text/css")
-    ),
+        tags$style(HTML("
+            .content {
+                height: 92vh;
+            }
+            .tab-content, .tab-pane, full-height, .col-sm-2, .col-sm-10, .box, .box-body {
+                height: 100% !important;
+            }
+            #Graph-network {
+                height: 85% !important;
+            }
+        "))
+      ),
     content("Content")
   )
 )

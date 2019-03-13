@@ -1,0 +1,8 @@
+
+.content {
+    height: 92vh;
+}
+
+.tab-content, tab-pane, full-height, Graph-network {
+    height: 100%;
+}

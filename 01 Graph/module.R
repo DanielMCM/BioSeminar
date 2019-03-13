@@ -15,13 +15,15 @@ Gra_menuItem <- function(id) {
 Gra_ui <- function(id) {
     ns <- NS(id)
     list(tabItem(tabName = str_c(id, "Graph"),
-        box(width = 3,
+        box(width = 2, style = "height:100%;",
             h3("Query options"),
             selectizeInput(ns("select"), "Select any node", choices = NULL, options = NULL, multiple = TRUE),
-            actionButton(ns("do_link"), "Call for symptoms"),
-            actionButton(ns("do"), "Generate 1 level conections"),
-            actionButton(ns("reset"), "Reset graph")),
-        box(width = 9, align = "Center",
+            actionButton(ns("do"), "Generate 1 level conections", style = "margin: 2px 0; width: 100%;"),
+            #actionButton(ns("do_link"), "Call for symptoms", style = "margin: 2px 0; width: 100%;"),
+            actionButton(ns("reset"), "Reset graph", style = "margin: 8px 0 24px 0; width: 100%;"),
+            div(style="margin: 4px 0;", HTML("<b>INSTRUCTIONS:</b> Select a disease or code and click on 'Generate 1 level conections' to expand one level of conections from the existent nodes per click.")),
+            div(HTML("<b>RESET:</b> In order to reset the values: Click on the 'reset' button, choose another value in the combobox and click on 'Generate 1 level conections' again."))),
+        box(width = 10, align = "Center", style = "height:100%;",
             h2("Diseases graph"), p(verbatimTextOutput(ns("message"))),
             visNetworkOutput(ns("network")))))
 }
