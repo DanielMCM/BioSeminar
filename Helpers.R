@@ -1,13 +1,13 @@
 calculate_nodes <- function(selection) {
     ## Links que salen de la seleccion
-    node_1a <- unique(merge(values$nodes[values$nodes[, "label"] %in%
+    node_1a <- unique(merge(values$nodes[values$nodes[, "id"] %in%
                         selection,],
                     values$edges[, c("from", "to")],
                     by.x = "id",
                     by.y = "from",
                     all.y = FALSE)[, c("id", "label", "title", "color")])
     ## Links que llegan a la seleccion
-    node_1b <- unique(merge(values$nodes[values$nodes[, "label"] %in%
+    node_1b <- unique(merge(values$nodes[values$nodes[, "id"] %in%
                         selection,],
                     values$edges[, c("from", "to")],
                     by.x = "id",
