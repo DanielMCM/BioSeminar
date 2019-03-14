@@ -17,12 +17,12 @@ Gra_ui <- function(id) {
     list(tabItem(tabName = str_c(id, "Graph"),
         fluidRow(box("The idea is as follows: 
                         (i) instert diseases
-                        (ii) click generate 1 level (each time you click you add adjacent nodes) 
-                        (iii) if you click in add symptoms (then on generate 1 level), you will aggregate the symptoms to each non-DISNET node")), 
+                        (ii) click generate connections (each time you click you add adjacent nodes) 
+                        (iii) if you click in add symptoms (then on generate 1 level), you will aggregate the symptoms to each non-DISNET node
+                        (iv) after this step you should restart the app to start again (or you will obtain wrong results")), 
         fluidRow(box("ERRORS DETECTED:
                         (i) Some nodes produces error when calling to the API (Not responsive for some codes)
-                        (ii) If all nodes have no CUI, it also return error
-                        (iii) We recommend to start with a DISXXXXX node")),
+                        (ii) if there is no response from API or there are no CUIs associated to a node, nothing is added")),
 
         box(width = 3,
             h3("Query options"),
@@ -38,7 +38,7 @@ Gra_ui <- function(id) {
 # Server
 
 Gra_server <- function(input, output, session) {
-    updateSelectizeInput(session, "select", choices = isolate(values$nodes)[, "label"], server = TRUE)
+    updateSelectizeInput(session, "select", choices = paste(isolate(values$nodes)[, "id"], " - ", isolate(values$nodes)[, "label"]), server = TRUE)
 
     mark <- reactiveValues(counter = -1, counter_link = -1,
                             node_5 = data.frame(title = character(),
@@ -46,7 +46,7 @@ Gra_server <- function(input, output, session) {
                                                 label = character(),
                                                 color = character()))
     node_3 <- reactive({
-        calculate_nodes(input$select)
+        calculate_nodes(substr(input$select, 1, unlist(gregexpr(pattern = ' .*', input$select)) - 1))
     })
 
     observeEvent(input$do, {
@@ -70,7 +70,7 @@ Gra_server <- function(input, output, session) {
                 return(mark$node_5)
             }
             else {
-                mark$node_5 <- calculate_nodes(mark$node_5$label)
+                mark$node_5 <- calculate_nodes(mark$node_5$id)
                 return(mark$node_5)
             }
         }
@@ -86,15 +86,10 @@ Gra_server <- function(input, output, session) {
             }
         }
         
+        
     })
 
     output$network <- renderVisNetwork({
-    #ledges <- data.frame(color = c("#339933",
-                                #rgb(252, 0, 0, max = 255), "lightblue"),
-                                #label = c("European Contribution under 993K",
-                                          #"European Contribution above 993K",
-                                          #"Researcher"))
-    # minimal example
         visNetwork(node_4(),
                values$edges[(values$edges[, "from"] %in% node_4()[, c("id")]) & (values$edges[, "to"] %in% node_4()[, c("id")]),],
                height = "1000px", width = "100%") %>%
@@ -105,27 +100,4 @@ Gra_server <- function(input, output, session) {
         visInteraction(hideEdgesOnDrag = TRUE) %>%
         visEdges(smooth = FALSE)
     })
-    #observe({
-        ## Trigger graph computing
-        #values$calculate_nodes_and_edges()
-    #})
-
-    #output$network <- renderVisNetwork({
-        #req(values$nodes)
-        #req(values$edges)
-
-        #print("Rendering VisNetwork...")
-
-        #return(visNetwork(values$nodes,
-                          #values$edges,
-                          #height = "2600px",
-                          #width = "100%",
-                          #visIgraphLayout() %>%
-                            #visPhysics(stabilization = FALSE) %>%
-                            #visLegend(addEdges = ledges, useGroups = TRUE) %>%
-                            #visInteraction(hideEdgesOnDrag = TRUE) %>%
-                            #visEdges(smooth = FALSE)
-                          #) #Visnetwork
-              #) #Return
-    #})
 }

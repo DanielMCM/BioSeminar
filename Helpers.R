@@ -1,13 +1,15 @@
 calculate_nodes <- function(selection) {
     ## Links que salen de la seleccion
-    node_1a <- unique(merge(values$nodes[values$nodes[, "label"] %in%
+    print(selection)
+    node_1a <- unique(merge(values$nodes[values$nodes[, "id"] %in%
                         selection,],
                     values$edges[, c("from", "to")],
                     by.x = "id",
                     by.y = "from",
                     all.y = FALSE)[, c("id", "label", "title", "color")])
+    print(node_1a)
     ## Links que llegan a la seleccion
-    node_1b <- unique(merge(values$nodes[values$nodes[, "label"] %in%
+    node_1b <- unique(merge(values$nodes[values$nodes[, "id"] %in%
                         selection,],
                     values$edges[, c("from", "to")],
                     by.x = "id",
@@ -36,47 +38,90 @@ calculate_nodes <- function(selection) {
 
 lookfor_links <- function(select) {
     ## Input are the nodes currently displayed
-
     ## We pick those nodes that are not from DISNET (
     look_0 <- select[(select[, "title"] != "DISNET") &
-                    (select[, "title"] != "Wheeless Online") &
-                    (select[, "title"] != "Patient UK"), 
+                    (select[, "title"] != "Symptom"),]
                     #(select[, "title"] != "eMedicine") &
                     #(select[, "title"] != "OMIM") &
                     #(select[, "title"] != "ICD-O"),
-    ]
-    print(look_0)
-    look_0$withsymp <- paste(look_0$label, " - ", look_0$title)
-
+    #print(look_0)
+    if ((nrow(look_0) > 0) & (ncol(look_0) > 0)) {
+        look_0$label_title <- paste(look_0$label, " - ", look_0$title)
+        #print(look_0[, "label_title"])
+        #print(values$withsymp[, "label_title"])
+        #print(look_0[,"label_title"] %in% values$withsymp[, "label_title"])
+        look <- subset(look_0, !(look_0$label_title %in% values$withsymp[,"label_title"]))
+        look[, "label"] <- sapply(look[, "label"], as.character)
+    } else {
+        return (select)
+    }
+    #print(look)
+    bind <- data.frame(look[, "label_title"])
+    colnames(bind) <- c("label_title")
+    #print(bind)
+    values$withsymp <- rbind(values$withsymp, bind)
+    #print(values$withsymp)
     ## We check if we already extracted them
-    look <- subset(look_0, !(look_0$withsymp %in% values$withsymp$label_title))
+
     if ((nrow(look) > 0) & (ncol(look)>0)) {
         ## For those that not, we extract them and add them to the list
-        for (i in 1:nrow(look)) {
-            if (i == 1) {
-                values$diseaseCode <- look[i, "label"]
+        for (i in row.names(look)) {
+            if (i == row.names(look)[1]) {
+                values$diseaseCode <- substr(look[i, "label"], unlist(gregexpr(pattern = '- .*', look[i, "label"])) + 2, nchar(look[i, "label"]))
+
                 values$typeCode <- look[i, "title"]
-                cuis <- isolate(unnest(values$diseases_with_disnetconcepts_by_code_and_type()$diseaseList))
-                
+                temp1 <- tryCatch(isolate(values$diseases_with_disnetconcepts_by_code_and_type()$diseaseList), error = function(e) return(1))
+
+                if (typeof(temp1) == "list") {
+                    cuis <- tryCatch(tidyr::unnest(temp1),
+                            error = function(e) return(data.frame(to = character(),
+                                                                    cui = character(),
+                                                                    name1 = character(),
+                                                                    title = character(),
+                                                                    color = character())))
+                } else {
+                    cuis <- data.frame(to = character(),
+                                    cui = character(),
+                                    name1 = character(),
+                                    title = character(),
+                                    color = character())
+                }
                 if (nrow(cuis) > 0 & ncol(cuis) > 0) {
                     cuis$to <- look_0[i, "id"]
-                    values$withsymp <- rbind(isolate(values$withsymp), look_0[i, "withsymp"])
                 } else {
-                    to <- data.frame(to = character(), cui = character())
+                    to <- data.frame(to = character(),
+                                    cui = character(),
+                                    name1 = character(),
+                                    title = character(),
+                                    color = character())
                     cuis <- cbind(cuis, to)
                 }
-
+                #print(cuis)
             }
             else {
-                values$diseaseCode <- look[i, "label"]
+                values$diseaseCode <- substr(look[i, "label"], unlist(gregexpr(pattern = '- .*', look[i, "label"])) + 2, nchar(look[i, "label"]))
+                #print(values$diseaseCode)
                 values$typeCode <- look[i, "title"]
-                precuis <- isolate(unnest(values$diseases_with_disnetconcepts_by_code_and_type()$diseaseList))
+                temp1 <- tryCatch(isolate(values$diseases_with_disnetconcepts_by_code_and_type()$diseaseList), error = function(e) return(1))
+                if (typeof(temp1) == "list") {
+                    precuis <- tryCatch(tidyr::unnest(temp1),
+                        error = function(e) return(data.frame(to = character(),
+                                                            cui = character(),
+                                                            name1 = character(),
+                                                            title = character(),
+                                                            color = character())))
+                } else {
+                    precuis <- data.frame(to = character(),
+                                    cui = character(),
+                                    name1 = character(),
+                                    title = character(),
+                                    color = character())
+                }
                 if (nrow(precuis) > 0 & ncol(precuis) > 0) {
                     precuis$to <- look_0[i, "id"]
                     cuis <- rbind(cuis, precuis)
-                    values$withsymp <- rbind(isolate(values$withsymp), look_0[i, "withsymp"])
                 }
-                print(cuis)
+                #print(cuis)
             }
         }
 
@@ -86,15 +131,20 @@ lookfor_links <- function(select) {
         colnames(pre_edge) <- c("from", "to")
 
         ## We select the ndoes to add
-        pre_node <- unique(cuis[, c("cui", "name1")])
-        colnames(pre_node) <- c("id", "label")
-        pre_node$title <- "Symptom"
-        pre_node$color <- "black"
+        if (nrow(cuis) > 0) {
+            pre_node <- unique(cuis[, c("cui", "name1")])
+            pre_node$title <- "Symptom"
+            pre_node$color <- "black"
+        } else {
+            pre_node <- unique(cuis[, c("cui", "name1", "title", "color")])
+        }
+        colnames(pre_node) <- c("id", "label", "title", "color")
         pre_node <- pre_node[, c("title", "id", "label", "color")]
-
+        pre_node <- subset(pre_node, !(pre_node[, "id"] %in% values$nodes[, "id"]))
+        #print(!(pre_node$id %in% values$nodes$id))
         ## We add them to the global
-        values$nodes <- rbind(isolate(values$nodes), pre_node)
-        values$edges <- rbind(isolate(values$edges), pre_edge)
+        values$nodes <- unique(rbind(isolate(values$nodes), pre_node))
+        values$edges <- unique(rbind(isolate(values$edges), pre_edge))
 
         ## We add them to the current selection
 
