@@ -21,7 +21,7 @@ Gra_ui <- function(id) {
                         (iii) if you click in add symptoms (then on generate 1 level), you will aggregate the symptoms to each non-DISNET node")), 
         fluidRow(box("ERRORS DETECTED:
                         (i) Some nodes produces error when calling to the API (Not responsive for some codes)
-                        (ii) If all nodes has no CUI, it also return error
+                        (ii) If all nodes have no CUI, it also return error
                         (iii) We recommend to start with a DISXXXXX node")),
 
         box(width = 3,
