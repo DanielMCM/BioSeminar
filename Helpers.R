@@ -57,18 +57,30 @@ lookfor_links <- function(select) {
                 values$diseaseCode <- look[i, "label"]
                 values$typeCode <- look[i, "title"]
                 cuis <- isolate(unnest(values$diseases_with_disnetconcepts_by_code_and_type()$diseaseList))
-                cuis$to <- look_0[i, "id"]
-                values$withsymp <- rbind(isolate(values$withsymp), look_0[i, "withsymp"])
+                
+                if (nrow(cuis) > 0 & ncol(cuis) > 0) {
+                    cuis$to <- look_0[i, "id"]
+                    values$withsymp <- rbind(isolate(values$withsymp), look_0[i, "withsymp"])
+                } else {
+                    to <- data.frame(to = character(), cui = character())
+                    cuis <- cbind(cuis, to)
+                }
+
             }
             else {
                 values$diseaseCode <- look[i, "label"]
                 values$typeCode <- look[i, "title"]
                 precuis <- isolate(unnest(values$diseases_with_disnetconcepts_by_code_and_type()$diseaseList))
-                precuis$to <- look_0[i, "id"]
-                cuis <- rbind(cuis, precuis)
-                values$withsymp <- rbind(isolate(values$withsymp), look_0[i, "withsymp"])
+                if (nrow(precuis) > 0 & ncol(precuis) > 0) {
+                    precuis$to <- look_0[i, "id"]
+                    cuis <- rbind(cuis, precuis)
+                    values$withsymp <- rbind(isolate(values$withsymp), look_0[i, "withsymp"])
+                }
+                print(cuis)
             }
         }
+
+
         ## We select the the edges to add
         pre_edge <- cuis[, c("cui", "to")]
         colnames(pre_edge) <- c("from", "to")
