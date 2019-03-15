@@ -29,7 +29,9 @@ Gra_ui <- function(id) {
             selectizeInput(ns("select"), "Select any node", choices = NULL, options = NULL, multiple = TRUE),
             actionButton(ns("do_link"), "Add symptoms"),
             actionButton(ns("do"), "Generate 1 level conections"),
-            actionButton(ns("reset"), "Reset graph")),
+            actionButton(ns("reset"), "Reset graph"),
+            div(style="margin-top: 20px;", HTML("<b>Number of Nodes:</b>")),
+            verbatimTextOutput(ns("NNodes"))),
         box(width = 9, align = "Center",
             h2("Diseases graph"), p(verbatimTextOutput(ns("message"))),
             visNetworkOutput(ns("network")))))
@@ -99,5 +101,9 @@ Gra_server <- function(input, output, session) {
         visPhysics(stabilization = FALSE) %>%
         visInteraction(hideEdgesOnDrag = TRUE) %>%
         visEdges(smooth = FALSE)
+    })
+
+    output$NNodes <- renderText({
+        nrow(node_4())
     })
 }
